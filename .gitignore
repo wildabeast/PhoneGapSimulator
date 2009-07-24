@@ -1,0 +1,8 @@
+lib/**/*
+bin-debug
+others
+.DS_Store
+.actionScriptProperties
+.flexProperties
+.project
+.settings/
