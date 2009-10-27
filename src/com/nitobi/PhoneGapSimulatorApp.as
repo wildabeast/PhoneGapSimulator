@@ -37,6 +37,7 @@ package com.nitobi
 		//Menu Related
 		public var menuMain:NativeMenu = new NativeMenu;
 		public var menuSkin:NativeMenu = new NativeMenu;
+		public var menuScale:NativeMenu = new NativeMenu;
 		public var menuIdCollection:Array = [];
 		
 		// Skin Related
@@ -45,6 +46,7 @@ package com.nitobi
 		public var horizontalOrientation:Boolean = false;
 		private var tempOrientation:Boolean = false;
 		public var screenRotation:Number = 0;
+		public var scale:Number = 1;
 		
 		// UI Related
 		public var width:int = 0;

@@ -87,6 +87,26 @@ package com.nitobi
 			}
 		}
 		
+		public static function changeScale(simulator:PhoneGapSimulator, selectedSkinString:String):void
+		{
+			var app:PhoneGapSimulatorApp = PhoneGapSimulatorApp.getInstance();
+			var scale:Number = parseFloat( selectedSkinString.replace(/x/, '') );
+			
+			for each (var item:NativeMenuItem in app.menuScale.items)
+			{
+				if (item.label == selectedSkinString)
+				{
+					item.checked = true;
+				}
+				else 
+				{
+					item.checked = false;
+				}
+			}
+			
+			app.scale = scale;
+		}
+			
 		public static function changeSkin(simulator:PhoneGapSimulator, selectedSkinString:String):void
 		{
 			var app:PhoneGapSimulatorApp = PhoneGapSimulatorApp.getInstance();
