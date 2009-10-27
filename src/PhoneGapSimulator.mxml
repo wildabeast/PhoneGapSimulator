@@ -11,6 +11,7 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import com.nitobi.event.SkinEvent;
 			import com.nitobi.view.UpdateAlert;
 			import com.nitobi.managers.UpdateManager;
 			import com.nitobi.event.MaskEvent;
@@ -48,15 +49,15 @@
 				loadXML();
 				app.html = pageLoader;
 				debug();
-				//app.debug.open();
 				trace(this.nativeApplication.applicationID, nativeApplication.applicationDescriptor.children()[3]);
 				
 				// Linsteners
 				app.addEventListener(VibrateEvent.VIBRATE_EVENT_START, onVibrate);
 				app.addEventListener(BlinkEvent.BLINK_START, onBlink);
+				app.addEventListener(SkinEvent.SKIN_CHANGE, onSkinChange);
 				app.addEventListener(MaskEvent.REDRAW_MASK, onRedrawMask)
 				
-				//app.checkForUpdate();
+				app.checkForUpdate();
 				app.updateManager.addEventListener(UpdateManager.EVENT_UPDATE_AVAILABLE,onUpdateAvailable);
 				app.updateManager.addEventListener(UpdateManager.EVENT_UPDATE_READY,onUpdateReady);
 				
@@ -85,7 +86,7 @@
 			
 			public function alertReadyClickHandler(evt:Event):void
 			{
-				//app.updateManager.installUpdate();
+				app.updateManager.installUpdate();
 			}
 			
 			private function onRedrawMask(e:MaskEvent):void
@@ -167,7 +168,6 @@
 			{
 				var itemArray:Array = [];
 				
-				//itemArray.push( app.menuMain.addItem( new NativeMenuItem( Const.MENU_URL ) ) );
 				addMenuItemWithSeperator( Const.MENU_RELOAD );
 				
 				for each (var name:String in app.menuIdCollection)
@@ -175,10 +175,6 @@
 					itemArray.push( app.menuSkin.addItem( new NativeMenuItem( name ) ) );
 				}
 				app.menuMain.addSubmenu( app.menuSkin, 'Skin' );
-								
-				//itemArray.push( app.menuMain.addItem( new NativeMenuItem( Const.MENU_DEMO ) ) );
-				
-				//addMenuItemWithSeperator( Const.MENU_DEBUG );
 								
 				itemArray.push( app.menuMain.addItem( new NativeMenuItem( Const.MENU_EXIT ) ) );
 				
@@ -278,6 +274,19 @@
 				displayMask.graphics.curveTo(0, h, 0, h-r);
 				
 			}
+					
+			private function onSkinChange(e:SkinEvent):void
+			{
+				const containerDir:String = 'assets/skin/SKINSTRING/main.png';
+				const headerPortraitDir:String = 'assets/skin/SKINSTRING/header_portrait.png';
+				const headerLandscapeDir:String = 'assets/skin/SKINSTRING/header_landscape.png';
+				
+				var skin:String = e.skinString;
+				
+				mainContainer.setStyle('backgroundImage', containerDir.replace(/SKINSTRING/, skin));
+				headerPortrait.setStyle('backgroundImage', headerPortraitDir.replace(/SKINSTRING/, skin));
+				headerLandscape.setStyle('backgroundImage', headerLandscapeDir.replace(/SKINSTRING/, skin));
+			}
 			
 		]]>
 	</mx:Script>
@@ -293,7 +302,6 @@
 			horizontalScrollPolicy="off" verticalScrollPolicy="off">
 			
 			<mx:Canvas id="mainContainer"
-				styleName="{app.skinString}MainContainer"
 				x="{-width/2 + (width/2-app.width/2)}" y="{-height/2}"
 				width="{app.width}" height="{app.height}" clipContent="false"
 				horizontalScrollPolicy="off" verticalScrollPolicy="off">
@@ -312,14 +320,14 @@
 					height="{(!app.horizontalOrientation ? app.screenHeight : app.screenWidth)}" >
 					
 					<mx:Canvas 
+						id="headerPortrait"
 						visible="{!app.horizontalOrientation}"
-						styleName="{app.skinString}HeaderPortrait"
 						height="{app.headerHeight}"
 						width="100%" />
 				
 					<mx:Canvas 
+						id="headerLandscape"
 						visible="{app.horizontalOrientation}"
-						styleName="{app.skinString}HeaderLandscape"
 						height="{app.headerHeight}"
 						width="100%" />
 					
@@ -355,7 +363,7 @@
 				</mx:Canvas>
 					
 				<mx:Button id="button" 
-					styleName="{app.skinString}Button" 
+					alpha="0" toolTip="Reload"
 					x="161" y="627"
 					width="80" height="80"
 					click="pageLoader.reload()"/>
