@@ -4,10 +4,11 @@
 	layout="absolute"
 	width="{Util.getWidth(app.edgeL, app.rotation, app.edgeD)}" 
 	height="{app.height}" 
-	autoExit="true"
+	autoExit="true" 
+	scaleX="{app.scale}" scaleY="{app.scale}"
 	showGripper="false" showTitleBar="false" showStatusBar="false"
-	creationComplete="init()" xmlns:cc="cc.*" 
-	horizontalScrollPolicy="off" verticalScrollPolicy="off" >
+	creationComplete="init()" xmlns:cc="cc.*"
+	horizontalScrollPolicy="off" verticalScrollPolicy="off">
 	
 	<mx:Script>
 		<![CDATA[
@@ -170,18 +171,34 @@
 				
 				addMenuItemWithSeperator( Const.MENU_RELOAD );
 				
+				// Add Skin
 				for each (var name:String in app.menuIdCollection)
 				{	
 					itemArray.push( app.menuSkin.addItem( new NativeMenuItem( name ) ) );
 				}
 				app.menuMain.addSubmenu( app.menuSkin, 'Skin' );
-								
-				itemArray.push( app.menuMain.addItem( new NativeMenuItem( Const.MENU_EXIT ) ) );
 				
 				for each (var item:NativeMenuItem in itemArray)
 				{
 					item.addEventListener(Event.SELECT, onSelect);
 				}
+				
+				//Add Scale	
+				itemArray = [];
+				
+				for each (var scale:Number in [1, 0.75, 0.5, 0.25])
+				{	
+					itemArray.push( app.menuScale.addItem( new NativeMenuItem( scale.toString() + 'x' ) ) );
+				}
+				app.menuMain.addSubmenu( app.menuScale, 'Scale' );
+				
+				for each (item in itemArray)
+				{
+					item.addEventListener(Event.SELECT, onScaleSelect);
+				}
+								
+				// Add exit
+				itemArray.push( app.menuMain.addItem( new NativeMenuItem( Const.MENU_EXIT ) ) );
 				
 				function addMenuItemWithSeperator( title:String):void
 				{
@@ -225,7 +242,13 @@
 						pageLoader.reload()
 						break;
 				}
-				
+			}
+			
+			private function onScaleSelect(e:Event):void
+			{
+				var selectedItem:NativeMenuItem = e.target as NativeMenuItem;
+				var caption:String = selectedItem.label;
+				Util.changeScale(this, caption);
 			}
 			
 			private function openURLModal():void
