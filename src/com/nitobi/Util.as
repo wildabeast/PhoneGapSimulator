@@ -1,6 +1,7 @@
 package com.nitobi
 {
 	import com.nitobi.event.MaskEvent;
+	import com.nitobi.event.SkinEvent;
 	
 	import flash.display.NativeMenuItem;
 	import flash.display.Screen;
@@ -135,6 +136,10 @@ package com.nitobi
 			app.rotation = 0;
 			
 			app.dispatchEvent(new MaskEvent(MaskEvent.REDRAW_MASK));
+			
+			var ev:SkinEvent = new SkinEvent(SkinEvent.SKIN_CHANGE);
+			ev.skinString = app.skinData['SKIN_' + id];
+			app.dispatchEvent( ev );
 		}
 		
 		public static function getWidth(edgeL:Number, rot:Number, edgeD:Number):Number

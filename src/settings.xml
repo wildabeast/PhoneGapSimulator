@@ -57,6 +57,16 @@
 		radius="1"
 		rotation="true">Nokia N97</skin>
 		
+	<skin id="SAMSUNG_EPIX" 
+		skin="samsungEpix" 
+		size="245,424" 
+		screen="44,42,160,160" 
+		scale="0.5"
+		button="102,239,44,44" 
+		header="0"
+		radius="2"
+		rotation="true">Samsung Epix</skin>
+		
 	<skin id="SUMSUNG_EPIX" 
 		skin="sumsungEpix" 
 		size="245,424" 
