@@ -27,6 +27,7 @@ package com.nitobi
 				{
 					var name:String = child.children().toString();
 					var id:String = child.@id;
+					id = name.toUpperCase().replace(/\s/g, '_');
 					var skinId:String = child.@skin;
 					
 					var size:Array = parseArray( child.@size.split(',') );
@@ -102,7 +103,7 @@ package com.nitobi
 				}
 			}
 			
-			var id:String = selectedSkinString.toUpperCase().replace(' ', '_');
+			var id:String = selectedSkinString.toUpperCase().replace(/\s/g, '_');
 			
 			app.skinString = app.skinData['SKIN_' + id];
 			
@@ -113,8 +114,8 @@ package com.nitobi
 			app.cornerRadius = app.skinData['RADIUS_' + id];
 			
 			var size:Point = app.skinData['SIZE_' + id];
-			app.width = size.x;
-			app.height = size.y;
+			app.width = size ? size.x : 100;
+			app.height = size ? size.y : 100;
 			app.edgeR = Math.atan( (app.height/2) / (app.width/2) );
 			app.edgeL = (app.width/2) / Math.cos(app.edgeR);
 			app.edgeD = (180/Math.PI)*app.edgeR;
