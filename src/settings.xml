@@ -63,6 +63,7 @@
 		header="0"
 		radius="0"
 		rotation="false">Samsung Epix</skin>
+<<<<<<< HEAD:src/settings.xml
 		
 	<skin id="SONY_ERICSSON_SATIO" 
 		skin="sonyEricssonSatio" 
@@ -83,6 +84,8 @@
 		radius="0"
 		scale="1"
 		rotation="true">Sony Ericsson Rachael</skin>
+=======
+>>>>>>> 96f091e0eb58442f830be5e5a2244cb0a27e0aee:src/settings.xml
 	
 	<url ><![CDATA[file://www/index.html]]></url>
 	<useragent><![CDATA[Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1A543a Safari/419.3]]></useragent>
