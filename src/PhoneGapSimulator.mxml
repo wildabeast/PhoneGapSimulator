@@ -8,10 +8,12 @@
 	scaleX="{app.scale}" scaleY="{app.scale}"
 	showGripper="false" showTitleBar="false" showStatusBar="false"
 	creationComplete="init()" xmlns:cc="cc.*"
-	horizontalScrollPolicy="off" verticalScrollPolicy="off">
+	horizontalScrollPolicy="off" verticalScrollPolicy="off"
+	invoke="onInvoke(event)">
 	
 	<mx:Script>
 		<![CDATA[
+			import nochump.util.zip.ZipFile;
 			import com.nitobi.event.SkinEvent;
 			import com.nitobi.view.UpdateAlert;
 			import com.nitobi.managers.UpdateManager;
@@ -28,6 +30,9 @@
 			import mx.managers.PopUpManager;
 			import mx.rpc.http.HTTPService;
 			import mx.rpc.events.ResultEvent;
+			import nochump.util.zip.ZipFile;
+			import nochump.util.zip.ZipEntry;
+			import flash.utils.IDataInput;
 			
 			[Bindable]
 			private var app:PhoneGapSimulatorApp = PhoneGapSimulatorApp.getInstance();
@@ -47,6 +52,7 @@
 			
 			private function init():void
 			{
+				trace("init");
 				loadXML();
 				app.html = pageLoader;
 				debug();
@@ -56,16 +62,88 @@
 				app.addEventListener(VibrateEvent.VIBRATE_EVENT_START, onVibrate);
 				app.addEventListener(BlinkEvent.BLINK_START, onBlink);
 				app.addEventListener(SkinEvent.SKIN_CHANGE, onSkinChange);
-				app.addEventListener(MaskEvent.REDRAW_MASK, onRedrawMask)
+				app.addEventListener(MaskEvent.REDRAW_MASK, onRedrawMask);
 				
 				app.checkForUpdate();
 				app.updateManager.addEventListener(UpdateManager.EVENT_UPDATE_AVAILABLE,onUpdateAvailable);
 				app.updateManager.addEventListener(UpdateManager.EVENT_UPDATE_READY,onUpdateReady);
 				
+ 
 				var fileText:String = File.applicationDirectory.nativePath.replace(/\\/g, "/");
 				app.currentURL = 'file://' + fileText + '/www/index.html';
 				
 				addEventListener(Event.CLOSE, onClose);
+			}
+			
+			public function onInvoke(evt:InvokeEvent):void
+			{
+				trace("invoke: " + evt.arguments[0]);
+				if (evt.arguments[0]) {
+					var startDir:String = unzip(evt.arguments[0]);
+					app.currentURL = 'file://' + startDir + 'index.html';
+				}
+			}
+			
+			
+			// param: the path to a phonegap app archive. assumes it contains a www/ dir
+			// returns: the path to the root directory of the unzipped phonegap app
+			public function unzip(path:String):String
+			{
+				var zipInput:File = new File();
+				var zipFile:ZipFile;
+				
+				zipInput = File.userDirectory.resolvePath(path);
+				var appName:String = zipInput.name.substring(0, zipInput.name.indexOf("."));
+				
+				var stream:FileStream = new FileStream();  
+				stream.open(zipInput,FileMode.READ);  
+				   
+				zipFile = new ZipFile(stream);  
+				stream.close();
+				
+				// write each file to appdir/apps/name/...
+				// then load index.html
+				
+				var applicationDirectoryPath:File = File.applicationDirectory;
+				var nativePathToApplicationDirectory:String = applicationDirectoryPath.nativePath.toString();
+				var appsPath:String = nativePathToApplicationDirectory + "/apps/";
+				
+				var firstEntry:ZipEntry = zipFile.entries[0];
+				var rootDir:String = firstEntry.name.substring(0,firstEntry.name.indexOf("/"));
+				trace("root: " + rootDir);
+				
+				for(var i:int = 0; i < zipFile.entries.length; i++) {
+					var entry:ZipEntry = zipFile.entries[i];
+					//trace(entry.name);
+					if (!entry.isDirectory()) {
+						// extract the entry's data from the zip
+						var data:ByteArray = zipFile.getInput(entry);
+						// expects a zipfile with just a single directory (rootDir)
+						var file:File = File.applicationDirectory.resolvePath(appsPath + entry.name.replace(rootDir + "/", appName + "/"));
+						var fileStream:FileStream = new FileStream(); 
+						fileStream.open(file, FileMode.WRITE); 
+						fileStream.writeBytes(data);
+						fileStream.close();
+					} else {
+						trace(entry.name);
+					}
+				}
+				
+				// copy www/phonegap.js to apps/_appname_/phonegap.js
+				
+				var sourceFile:File = new File(nativePathToApplicationDirectory + "/www/phonegap.js");
+				//sourceFile = sourceFile.resolvePath("www/phonegap.js");
+				trace(sourceFile.nativePath);
+				var destination:File = new File(appsPath + appName + "/phonegap.js");
+				//destination = destination.resolvePath("apps/" + appName + "/phonegap.js");
+				trace(destination.nativePath);
+				
+				if (sourceFile.copyTo(destination, true)) {
+				    trace("Done.");
+				}
+				
+				var startDir:String = appsPath + appName + "/";
+				return startDir;
 			}
 			
 			public function onUpdateAvailable(evt:Event):void
