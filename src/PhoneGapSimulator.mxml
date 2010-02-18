@@ -33,6 +33,7 @@
 			import nochump.util.zip.ZipFile;
 			import nochump.util.zip.ZipEntry;
 			import flash.utils.IDataInput;
+			import mx.controls.Alert;
 			
 			[Bindable]
 			private var app:PhoneGapSimulatorApp = PhoneGapSimulatorApp.getInstance();
@@ -50,9 +51,10 @@
 			
 			private var blinkLen:int = 0;
 			
+			private var invoked:Boolean = false;
+			
 			private function init():void
 			{
-				trace("init");
 				loadXML();
 				app.html = pageLoader;
 				debug();
@@ -68,15 +70,17 @@
 				app.updateManager.addEventListener(UpdateManager.EVENT_UPDATE_AVAILABLE,onUpdateAvailable);
 				app.updateManager.addEventListener(UpdateManager.EVENT_UPDATE_READY,onUpdateReady);
 				
- 
-				var fileText:String = File.applicationDirectory.nativePath.replace(/\\/g, "/");
-				app.currentURL = 'file://' + fileText + '/www/index.html';
+ 				if (!invoked) {
+					var fileText:String = File.applicationDirectory.nativePath.replace(/\\/g, "/");
+					app.currentURL = 'file://' + fileText + '/www/index.html';
+ 				}
 				
 				addEventListener(Event.CLOSE, onClose);
 			}
 			
 			public function onInvoke(evt:InvokeEvent):void
 			{
+				invoked = true;
 				trace("invoke: " + evt.arguments[0]);
 				if (evt.arguments[0]) {
 					var startDir:String = unzip(evt.arguments[0]);
@@ -238,7 +242,10 @@
 			{
 				var xml:XML = e.result as XML;
 				Util.parseXML(xml);
-				Util.changeSkin(this, 'iPhone');
+				if (invoked)
+					Util.changeSkin(this, 'Sony Ericsson Satio');
+				else
+					Util.changeSkin(this, 'iPhone');
 				createContextMenu();
 			}
 			
